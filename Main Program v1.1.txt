@@ -1,0 +1,153 @@
+var rootOfGlobalsInstall = process.env.GLOBALS_HOME;
+var rootOfNodeInstall = process.env.nodeRoot;
+var globals = require(rootOfNodeInstall+'\\cache');
+var pathToGlobalsMGR = rootOfGlobalsInstall + '/mgr';
+
+
+testMethod();
+
+
+
+
+
+
+function collection(name) {
+
+//Methods:
+	function addDocument(document) { //puts a "document" in the collection
+		this.documentCount++;
+		this.data.set(this.iden, document.id, document);
+		document.collection=this;
+	}
+
+	function dumpInfo (a) { //prints a bunch of stuff about the documents, including their contents	
+		if (this.documentCount===0)
+		{ 
+			console.log ("There are no documents in the \""+this.iden+
+					"\" collection.");
+			return;
+		}
+		if (a===1)
+		{
+			console.log("There are currently "+ this.documentCount +
+					" documents in the collection named \""+ this.iden+
+					"\". Documents are as follows:");
+
+			var node=this.data.order(this.iden, "");
+			while((node) !="")
+			{
+				console.log("\"" + node+ "\"");
+				var node2=this.data.order(this.iden, node, "");
+				while (node2!="")
+					{
+					console.log("key: "+ node2+ "  value: "+this.data.get(this.iden, node, node2));
+					node2=this.data.order(this.iden, node, node2);
+					}
+				node=this.data.order(this.iden, node);
+			}
+		}
+	}
+	
+
+
+	function findDocuments () {} //search feature to implement later
+
+	function clearDocuments () { //deletes all documents
+		this.data.kill(this.iden);
+		this.documentCount=0;
+	}
+	// end of methods for collections
+	
+	//the main part of the collection constructor:
+	this.iden=name;
+	this.documentCount=0;
+	this.data= new globals.Cache();
+	this.data.open({
+		path: pathToGlobalsMGR,
+		username: "userName",
+		password: "password",
+		namespace: name
+	}
+	);
+
+//these are actually very important, dont change them:
+	this.addDocument=addDocument;
+	this.dumpInfo=dumpInfo;
+	this.findDocuments=findDocuments;
+	this.clearDocuments=clearDocuments;
+
+}
+
+//end of collection method
+
+
+//documents are not very well implemented at this point
+function document(name){
+	
+	//main part of the constructor:
+	this.id=name;
+	this.collection;
+	this.numberOfData=0;
+
+	
+	
+	//supplementary methods:
+	function addDatum(key, value) //sets a data value of the document
+	{
+		this.collection.data.set(this.collection.iden, this.id, key, value);
+		this.numberOfData++;
+	}
+	
+	function dumpInfo() //prints stuff about the document. not currently operational
+	{
+		console.log("The document named " + this.id+ " has "+ this.numberOfData + " pieces of data");
+		var node=this.collection.data.order(this.collection.iden, this.id, "");
+		while(node!="")
+			{
+			console.log("\"" + node+ "\"= \"" + this.findValue(node)+"\"");
+			node=this.collection.data.order(this.collection.iden, this.id, node);
+			}
+	}
+	                                               
+	function findValue(key) //returns the documents's value at that key
+	{
+		return this.collection.data.get(this.collection.iden, this.id, key);
+	}
+	
+	function clearData()  //"resets" the document
+	{
+		this.collection.data.kill(this.collection.iden, this.id);
+		this.numberOfData=0;
+	}
+	// end supplementary methods
+	
+	
+	// the following are important:
+	this.addDatum=addDatum;
+	this.dumpInfo=dumpInfo;
+	this.findValue=findValue;
+	this.clearData=clearData;
+}
+//end of document method
+
+function testMethod(){ //a method used to test the features of Main
+
+	var a= new collection("consumables");
+	var doc1= new document("foods");
+	var doc2= new document("drinks");
+	a.addDocument(doc2);
+	a.addDocument(doc1);
+	doc1.addDatum("chocolate", "delicious");
+	doc1.addDatum("broccoli", "even more delicious!");
+	doc1.addDatum("eggplant", "its complicated");
+	doc2.addDatum("milk", "spoiled");
+	console.log("Creating some documents...\n");
+	a.dumpInfo(1);
+	console.log("\nClearing documents...");
+	a.clearDocuments();
+	a.dumpInfo(1);
+	a.data.close(); 
+}
+
+
+
