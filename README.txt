@@ -1,17 +1,18 @@
-In this folder there are two programs, both alike in dignity, in fair Node.js where we lay our scene.
+This program is a document-database built on globals Cache in Node.js.
 
-The programs are attempts to create a document database using globals in Node.js.
+In the current build, "collections" are primarily a global. The sub-nodes of a collection are "documents." Sub-nodes of a document are data.
+Currently it is advised that data only be primitive data types.
 
-Currently, the program can create one "collection" object, and can load some number of "documents" into it (although at this point a document is not well implemented).
-It also can clear the documents and has a "textDump" method which displays information about the collection.
-The only globals Cache methods it calls are get(), set(), and kill().
+Some methods include:
+testMethod(), which shows many of the features of this program
 
-In order to allow there to be more than one collection, I did a find/replace for the terms "'myGlobal'" and "this.iden". 'myGlobal' was a holder name that I was using, and this.iden is a value in the collection.
-After making this change, I got a strange bug. The error message is "Evented I/O for V8 JavaScript has stopped working." What is truly bizarre is that this bug occurs in the line 
-<code> a.addDocument("bas"); </code>
-but the program is able to run 
-<code> a.addDocument("foo");
-a.addDocument("bar"); </code>
-(which is directly before it) without any problem, so I am not sure what went wrong.
+addDocument(), which adds a document to a collection
+clearDocuments(), which deletes all documents from a collection
+dumpInfo(), which outputs a lot of information about a collection
 
-NOTE: You may have to change the first four lines of code to get the program running, since those lines determine where the program looks for Globals Cache.
+addDatum(), which changes a data value in a document
+findValue(), which returns the data value for a certain key
+and clearData(), which clears all data from a document
+
+
+Note: The program may not run if the path to your globals directory is not properly set. If you encounter this bug, you may have to change the first four lines of code so that the variable "globals" is set properly.
