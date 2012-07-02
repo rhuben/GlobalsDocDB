@@ -1,18 +1,19 @@
 This program is a document-database built on globals Cache in Node.js.
 
-In the current build, "collections" are primarily a global. The sub-nodes of a collection are "documents." Sub-nodes of a document are data.
-Currently it is advised that data only be primitive data types.
+In the current build, documents and collections are the same type of object (called "documents).
 
-Some methods include:
-testMethod(), which shows many of the features of this program
+The documents store their own information about the data structure (link to parent node,
+ links to each subnode, the path to themselves from the parent node, and a link to the global
+ itself, in particular). This allows for documents to be recursively held within each other.
 
-addDocument(), which adds a document to a collection
-clearDocuments(), which deletes all documents from a collection
-dumpInfo(), which outputs a lot of information about a collection
+This build is an improvement over the previous build because it allows docu-ception (documents
+ inside documents inside documents...). Known weaknesses include not being able to move a document
+ from one "branch" of the tree to another, and storing documents and non-documents separately.
 
-addDatum(), which changes a data value in a document
-findValue(), which returns the data value for a certain key
-and clearData(), which clears all data from a document
+NOTE: As previously, the first four lines of code determine where the program "looks" for globals cache,
+ and if it is unable to find it, it will encounter a bug.
 
-
-Note: The program may not run if the path to your globals directory is not properly set. If you encounter this bug, you may have to change the first four lines of code so that the variable "globals" is set properly.
+NOTE 2: In this version, before setting data, you must:
+	1)create a document
+	2)promote that document to a collection with promoteToCollection()
+	3)use addDatum() or addDocument() to add data or a document (respectively)
